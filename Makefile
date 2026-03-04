@@ -10,12 +10,15 @@ SED       ?= sed
 
 BUILDDIR  := target/dist
 
+CARGO_PROFILE ?= release
+
 .PHONY: all build dist install uninstall clean
 
 all: build dist
 
+# This is the normal build target that most people will want
 build:
-	$(CARGO) build --release
+	$(CARGO) build --profile=$(CARGO_PROFILE)
 
 dist:
 	@mkdir -p $(BUILDDIR)
@@ -23,7 +26,7 @@ dist:
 	$(SED) 's|Exec=.*|Exec=$(BINDIR)/aged daemon|' dist/org.aged.Daemon.service > $(BUILDDIR)/org.aged.Daemon.service
 
 install: all
-	$(INSTALL) -Dm755 target/release/aged                    $(DESTDIR)$(BINDIR)/aged
+	$(INSTALL) -Dm755 target/$(CARGO_PROFILE)/aged           $(DESTDIR)$(BINDIR)/aged
 	$(INSTALL) -Dm644 $(BUILDDIR)/aged.service               $(DESTDIR)$(LIBDIR)/systemd/user/aged.service
 	$(INSTALL) -Dm644 $(BUILDDIR)/org.aged.Daemon.service    $(DESTDIR)$(DATADIR)/dbus-1/services/org.aged.Daemon.service
 	$(INSTALL) -Dm644 dist/jurisdictions.toml                $(DESTDIR)$(DATADIR)/aged/jurisdictions.toml
