@@ -1,0 +1,6 @@
+[storage]
+backend = "secret-service"  # or "file"
+
+[jurisdictions]
+# Extra jurisdiction files to load (merged with built-in defaults)
+extra_paths = []

@@ -1,0 +1,27 @@
+[Unit]
+Description=Age Bracket Verification Daemon
+After=dbus.service
+
+[Service]
+Type=notify
+ExecStart=%h/.cargo/bin/aged daemon
+Restart=on-failure
+
+# Sandboxing
+NoNewPrivileges=true
+ProtectSystem=strict
+ProtectHome=read-only
+ReadWritePaths=%h/.config/aged
+PrivateNetwork=true
+ProtectKernelTunables=true
+ProtectKernelModules=true
+ProtectControlGroups=true
+RestrictRealtime=true
+RestrictSUIDSGID=true
+MemoryDenyWriteExecute=true
+LockPersonality=true
+SystemCallFilter=@system-service
+SystemCallErrorNumber=EPERM
+
+[Install]
+WantedBy=default.target

@@ -1,0 +1,17 @@
+[[jurisdiction]]
+name = "US/California"
+region = "US-CA"
+brackets = [
+    { max_age = 13, label = "child" },
+    { max_age = 18, label = "minor" },
+    { label = "adult" },
+]
+
+[[jurisdiction]]
+name = "US/Colorado"
+region = "US-CO"
+brackets = [
+    { max_age = 18, label = "minor" },
+    { max_age = 65, label = "adult" },
+    { label = "senior" },
+]

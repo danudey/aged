@@ -1,0 +1,4 @@
+[D-BUS Service]
+Name=org.aged.Daemon
+Exec=%h/.cargo/bin/aged daemon
+SystemdService=aged.service

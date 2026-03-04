@@ -1,0 +1,27 @@
+[package]
+name = "aged"
+version = "0.1.0"
+edition = "2024"
+description = "Age Bracket Verification Daemon"
+
+[features]
+default = ["systemd"]
+systemd = ["dep:sd-notify"]
+geoclue = ["dep:tzf-rs"]
+
+[dependencies]
+anyhow = "1"
+async-trait = "0.1"
+chrono = { version = "0.4", features = ["serde"] }
+clap = { version = "4", features = ["derive"] }
+directories = "6"
+sd-notify = { version = "0.4", optional = true }
+secret-service = { version = "4", features = ["rt-tokio-crypto-rust"] }
+serde = { version = "1", features = ["derive"] }
+thiserror = "2"
+tokio = { version = "1", features = ["full"] }
+toml = "0.8"
+tracing = "0.1"
+tracing-subscriber = { version = "0.3", features = ["env-filter"] }
+tzf-rs = { version = "0.4", optional = true }
+zbus = "5"
