@@ -1,0 +1,27 @@
+Source: aged
+Section: utils
+Priority: optional
+Maintainer: Dan <dan@example.com>
+Build-Depends:
+ debhelper-compat (= 13),
+ cargo,
+ rustc,
+Standards-Version: 4.6.2
+Rules-Requires-Root: no
+
+Package: aged
+Architecture: any
+Depends:
+ ${shlibs:Depends},
+ ${misc:Depends},
+ dbus,
+Recommends:
+ gnome-keyring | kwalletmanager,
+Description: Age Bracket Verification Daemon
+ aged is a daemon that stores a user's birthdate, defines
+ jurisdiction-specific age brackets, and exposes a D-Bus (and CLI)
+ API for applications to query which bracket the user falls into.
+ .
+ Jurisdictions such as US/California and US/Colorado define their
+ own age brackets. The daemon stores the birthdate in the user's
+ keychain via the Secret Service API, falling back to a plain file.

@@ -1,0 +1,25 @@
+pkgname=aged
+pkgver=0.1.0
+pkgrel=1
+pkgdesc='Age Bracket Verification Daemon'
+arch=('x86_64' 'aarch64')
+url='https://github.com/example/aged'
+license=('TODO')
+depends=('dbus')
+makedepends=('cargo' 'make')
+optdepends=(
+    'gnome-keyring: Secret Service storage backend'
+    'kwallet: Secret Service storage backend'
+)
+source=("$pkgname-$pkgver.tar.gz")
+sha256sums=('SKIP')
+
+build() {
+    cd "$pkgname-$pkgver"
+    make PREFIX=/usr
+}
+
+package() {
+    cd "$pkgname-$pkgver"
+    make install DESTDIR="$pkgdir" PREFIX=/usr
+}

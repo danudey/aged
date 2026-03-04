@@ -1,0 +1,15 @@
+#!/usr/bin/make -f
+
+%:
+	dh $@
+
+override_dh_auto_build:
+	$(MAKE) PREFIX=/usr
+
+override_dh_auto_install:
+	$(MAKE) install DESTDIR=$(CURDIR)/debian/aged PREFIX=/usr
+
+override_dh_auto_clean:
+	$(MAKE) clean
+
+override_dh_auto_test:
