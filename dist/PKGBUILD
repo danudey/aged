@@ -1,5 +1,5 @@
 pkgname=aged
-pkgver=0.1.0
+pkgver=0.1.0 # x-release-please-version
 pkgrel=1
 pkgdesc='Age Bracket Verification Daemon'
 arch=('x86_64' 'aarch64')

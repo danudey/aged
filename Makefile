@@ -12,7 +12,9 @@ BUILDDIR  := target/dist
 
 CARGO_PROFILE ?= release
 
-.PHONY: all build dist install uninstall clean
+VERSION := $(shell git describe)
+
+.PHONY: all build dist archive install uninstall clean
 
 all: build dist
 
@@ -24,6 +26,10 @@ dist:
 	@mkdir -p $(BUILDDIR)
 	$(SED) 's|ExecStart=.*|ExecStart=$(BINDIR)/aged daemon|' dist/aged.service > $(BUILDDIR)/aged.service
 	$(SED) 's|Exec=.*|Exec=$(BINDIR)/aged daemon|' dist/org.aged.Daemon.service > $(BUILDDIR)/org.aged.Daemon.service
+
+archive:
+	@mkdir -p $(BUILDDIR)
+	git archive --format=tar.gz --prefix=aged-$(VERSION)/ -o $(BUILDDIR)/aged-$(VERSION).tar.gz HEAD
 
 install: all
 	$(INSTALL) -Dm755 target/$(CARGO_PROFILE)/aged           $(DESTDIR)$(BINDIR)/aged
