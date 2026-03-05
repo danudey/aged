@@ -44,9 +44,7 @@ trait GeoClueLocation {
     fn longitude(&self) -> zbus::Result<f64>;
 }
 
-pub async fn detect_jurisdiction(
-    registry: &JurisdictionRegistry,
-) -> Result<String, Error> {
+pub async fn detect_jurisdiction(registry: &JurisdictionRegistry) -> Result<String, Error> {
     let connection = Connection::system()
         .await
         .map_err(|e| Error::GeoClue(format!("connect to system bus: {e}")))?;

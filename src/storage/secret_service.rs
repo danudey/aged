@@ -99,9 +99,7 @@ impl Storage for SecretServiceStorage {
     async fn load_birthdate(&self) -> Result<Option<NaiveDate>, Error> {
         match self.load_secret(BIRTHDATE_LABEL).await? {
             Some(s) => {
-                let date = s
-                    .parse::<NaiveDate>()
-                    .map_err(|_| Error::InvalidDate(s))?;
+                let date = s.parse::<NaiveDate>().map_err(|_| Error::InvalidDate(s))?;
                 Ok(Some(date))
             }
             None => Ok(None),

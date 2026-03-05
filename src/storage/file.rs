@@ -44,8 +44,7 @@ impl FileStorage {
         if let Some(parent) = self.path.parent() {
             std::fs::create_dir_all(parent)?;
         }
-        let contents =
-            toml::to_string_pretty(data).map_err(|e| Error::Storage(e.to_string()))?;
+        let contents = toml::to_string_pretty(data).map_err(|e| Error::Storage(e.to_string()))?;
         std::fs::write(&self.path, contents)?;
         Ok(())
     }
@@ -63,9 +62,7 @@ impl Storage for FileStorage {
         let data = self.read_data()?;
         match data.birthdate {
             Some(s) => {
-                let date = s
-                    .parse::<NaiveDate>()
-                    .map_err(|_| Error::InvalidDate(s))?;
+                let date = s.parse::<NaiveDate>().map_err(|_| Error::InvalidDate(s))?;
                 Ok(Some(date))
             }
             None => Ok(None),

@@ -46,9 +46,8 @@ impl JurisdictionRegistry {
     }
 
     pub fn load_builtin(&mut self) {
-        let builtin: JurisdictionFile =
-            toml::from_str(include_str!("../dist/jurisdictions.toml"))
-                .expect("built-in jurisdictions.toml is valid");
+        let builtin: JurisdictionFile = toml::from_str(include_str!("../dist/jurisdictions.toml"))
+            .expect("built-in jurisdictions.toml is valid");
         for j in builtin.jurisdiction {
             self.jurisdictions.insert(j.name.clone(), j);
         }

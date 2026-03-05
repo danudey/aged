@@ -24,10 +24,7 @@ impl AgedDbus {
         Ok(())
     }
 
-    async fn get_age_bracket(
-        &self,
-        jurisdiction: &str,
-    ) -> Result<String, zbus::fdo::Error> {
+    async fn get_age_bracket(&self, jurisdiction: &str) -> Result<String, zbus::fdo::Error> {
         let birthdate = self
             .storage
             .load_birthdate()
@@ -61,10 +58,7 @@ impl AgedDbus {
         Ok(name)
     }
 
-    async fn set_default_jurisdiction(
-        &self,
-        name: &str,
-    ) -> Result<(), zbus::fdo::Error> {
+    async fn set_default_jurisdiction(&self, name: &str) -> Result<(), zbus::fdo::Error> {
         // Validate the jurisdiction exists
         if self.jurisdictions.get(name).is_none() {
             return Err(Error::UnknownJurisdiction(name.to_string()).into());
