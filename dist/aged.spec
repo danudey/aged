@@ -3,7 +3,7 @@ Version:        0.1.0
 Release:        1%{?dist}
 Summary:        Age Bracket Verification Daemon
 
-License:        TODO
+License:        MIT
 URL:            https://github.com/example/aged
 Source0:        %{name}-%{version}.tar.gz
 
@@ -34,6 +34,7 @@ make CARGO_PROFILE=%{cargo_profile} PREFIX=%{_prefix} LIBDIR=%{_prefix}/lib
 make install CARGO_PROFILE=%{cargo_profile} DESTDIR=%{buildroot} PREFIX=%{_prefix} LIBDIR=%{_prefix}/lib
 
 %files
+%license LICENSE
 %{_bindir}/aged
 %{_prefix}/lib/systemd/user/aged.service
 %{_datadir}/dbus-1/services/org.aged.Daemon.service

@@ -3,6 +3,7 @@ name = "aged"
 version = "0.1.0"
 edition = "2024"
 description = "Age Bracket Verification Daemon"
+license = "MIT"
 
 [profile.release-with-debug]
 inherits = "release"
