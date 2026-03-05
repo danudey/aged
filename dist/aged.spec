@@ -28,10 +28,10 @@ API for applications to query which bracket the user falls into.
 %build
 # NOTE: systemd user units must go under prefix/lib, not %%{_libdir}
 # which expands to /usr/lib64 on 64-bit RPM distros.
-make CARGO_PROFILE=${cargo_profile} PREFIX=%{_prefix} LIBDIR=%{_prefix}/lib
+make CARGO_PROFILE=%{cargo_profile} PREFIX=%{_prefix} LIBDIR=%{_prefix}/lib
 
 %install
-make install CARGO_PROFILE=${cargo_profile} DESTDIR=%{buildroot} PREFIX=%{_prefix} LIBDIR=%{_prefix}/lib
+make install CARGO_PROFILE=%{cargo_profile} DESTDIR=%{buildroot} PREFIX=%{_prefix} LIBDIR=%{_prefix}/lib
 
 %files
 %{_bindir}/aged
