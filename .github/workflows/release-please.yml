@@ -12,6 +12,9 @@ permissions:
 jobs:
   release-please:
     runs-on: ubuntu-latest
+    outputs:
+      release_created: ${{ steps.release.outputs.release_created }}
+      tag_name: ${{ steps.release.outputs.tag_name }}
     steps:
       - uses: googleapis/release-please-action@v4
         id: release
@@ -19,14 +22,101 @@ jobs:
           config-file: release-please-config.json
           manifest-file: .release-please-manifest.json
 
+  archive:
+    needs: release-please
+    if: ${{ needs.release-please.outputs.release_created }}
+    runs-on: ubuntu-latest
+    steps:
       - uses: actions/checkout@v4
-        if: ${{ steps.release.outputs.release_created }}
+        with:
+          fetch-depth: 0
+
+      - name: Build source archive
+        run: make archive
 
       - name: Upload source archive
-        if: ${{ steps.release.outputs.release_created }}
         env:
           GH_TOKEN: ${{ github.token }}
-          TAG: ${{ steps.release.outputs.tag_name }}
+          TAG: ${{ needs.release-please.outputs.tag_name }}
+        run: gh release upload "$TAG" target/dist/aged-*.tar.gz
+
+  deb:
+    needs: release-please
+    if: ${{ needs.release-please.outputs.release_created }}
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Install Rust toolchain
+        uses: dtolnay/rust-toolchain@stable
+
+      - name: Install build dependencies
+        run: sudo apt-get update && sudo apt-get install -y debhelper
+
+      - name: Build .deb
+        run: dpkg-buildpackage -us -uc -b
+
+      - name: Upload .deb
+        env:
+          GH_TOKEN: ${{ github.token }}
+          TAG: ${{ needs.release-please.outputs.tag_name }}
+        run: gh release upload "$TAG" ../*.deb
+
+  rpm:
+    needs: release-please
+    if: ${{ needs.release-please.outputs.release_created }}
+    runs-on: ubuntu-latest
+    container: fedora:latest
+    steps:
+      - name: Install system dependencies
+        run: dnf install -y git rpm-build gcc gh curl
+
+      - uses: actions/checkout@v4
+
+      - name: Install Rust toolchain
         run: |
-          make archive
-          gh release upload "$TAG" target/dist/aged-*.tar.gz
+          curl --proto '=https' --tlsv1.2 -sSf https://sh.rustup.rs | sh -s -- -y
+          echo "$HOME/.cargo/bin" >> "$GITHUB_PATH"
+
+      - name: Build RPM
+        run: |
+          VERSION=$(grep '^version' Cargo.toml | head -1 | sed 's/.*"\(.*\)".*/\1/')
+          git archive --format=tar.gz --prefix=aged-$VERSION/ -o aged-$VERSION.tar.gz HEAD
+          mkdir -p ~/rpmbuild/{SOURCES,SPECS}
+          cp aged-$VERSION.tar.gz ~/rpmbuild/SOURCES/
+          sed 's/ *# *x-release-please-version//' dist/aged.spec > ~/rpmbuild/SPECS/aged.spec
+          rpmbuild -bb ~/rpmbuild/SPECS/aged.spec
+
+      - name: Upload RPM
+        env:
+          GH_TOKEN: ${{ github.token }}
+          TAG: ${{ needs.release-please.outputs.tag_name }}
+        run: gh release upload "$TAG" ~/rpmbuild/RPMS/*/*.rpm
+
+  arch:
+    needs: release-please
+    if: ${{ needs.release-please.outputs.release_created }}
+    runs-on: ubuntu-latest
+    container: archlinux:latest
+    steps:
+      - name: Install system dependencies
+        run: pacman -Sy --noconfirm git cargo rust base-devel github-cli
+
+      - uses: actions/checkout@v4
+
+      - name: Build package
+        run: |
+          VERSION=$(grep '^version' Cargo.toml | head -1 | sed 's/.*"\(.*\)".*/\1/')
+          git archive --format=tar.gz --prefix=aged-$VERSION/ -o aged-$VERSION.tar.gz HEAD
+          mkdir /tmp/pkgbuild
+          cp dist/PKGBUILD aged-$VERSION.tar.gz /tmp/pkgbuild/
+          cd /tmp/pkgbuild
+          useradd -m builder
+          chown -R builder:builder .
+          su builder -c 'makepkg -fd --noconfirm'
+
+      - name: Upload package
+        env:
+          GH_TOKEN: ${{ github.token }}
+          TAG: ${{ needs.release-please.outputs.tag_name }}
+        run: gh release upload "$TAG" /tmp/pkgbuild/*.pkg.tar.zst

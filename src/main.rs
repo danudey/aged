@@ -69,10 +69,10 @@ fn load_jurisdictions(config: &Config) -> JurisdictionRegistry {
     // Also try loading from XDG config
     if let Some(dirs) = directories::ProjectDirs::from("org", "aged", "aged") {
         let user_jurisdictions = dirs.config_dir().join("jurisdictions.toml");
-        if user_jurisdictions.exists() {
-            if let Err(e) = registry.load_file(&user_jurisdictions) {
-                tracing::warn!("failed to load user jurisdictions: {e}");
-            }
+        if user_jurisdictions.exists()
+            && let Err(e) = registry.load_file(&user_jurisdictions)
+        {
+            tracing::warn!("failed to load user jurisdictions: {e}");
         }
     }
 
