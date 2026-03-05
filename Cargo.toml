@@ -25,7 +25,7 @@ secret-service = { version = "4", features = ["rt-tokio-crypto-rust"] }
 serde = { version = "1", features = ["derive"] }
 thiserror = "2"
 tokio = { version = "1", features = ["full"] }
-toml = "0.8"
+toml = "1.0"
 tracing = "0.1"
 tracing-subscriber = { version = "0.3", features = ["env-filter"] }
 tzf-rs = { version = "0.4", optional = true }
