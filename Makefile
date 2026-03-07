@@ -18,6 +18,9 @@ VERSION := $(shell git describe)
 
 all: build dist
 
+deb:
+	fakeroot debian/rules binary
+
 # This is the normal build target that most people will want
 build:
 	$(CARGO) build --profile=$(CARGO_PROFILE)
