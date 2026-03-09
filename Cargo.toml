@@ -28,7 +28,7 @@ tokio = { version = "1", features = ["full"] }
 toml = "0.9.8"
 tracing = "0.1"
 tracing-subscriber = { version = "0.3", features = ["env-filter"] }
-tzf-rs = { version = "1.1.4", optional = true }
+tzf-rs = { version = "1.1.5", optional = true }
 zbus = "5"
 
 [dev-dependencies]
