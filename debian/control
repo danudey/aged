@@ -1,7 +1,7 @@
 Source: aged
 Section: utils
 Priority: optional
-Maintainer: Dan <dan@example.com>
+Maintainer: Daniel Fox <danudey@me.com>
 Build-Depends:
  debhelper-compat (= 13),
  cargo,

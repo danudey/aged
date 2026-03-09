@@ -4,7 +4,7 @@ Release:        1%{?dist}
 Summary:        Age Bracket Verification Daemon
 
 License:        MIT
-URL:            https://github.com/example/aged
+URL:            https://github.com/danudey/aged
 Source0:        %{name}-%{version}.tar.gz
 
 BuildRequires:  cargo
