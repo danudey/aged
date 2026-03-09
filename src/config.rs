@@ -48,3 +48,77 @@ impl Config {
         }
     }
 }
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+    use std::io::Write;
+
+    #[test]
+    fn default_config() {
+        let config = Config::default();
+        assert_eq!(config.storage.backend, "secret-service");
+        assert!(config.jurisdictions.extra_paths.is_empty());
+    }
+
+    #[test]
+    fn load_missing_file_returns_defaults() {
+        let config = Config::load(Path::new("/tmp/aged-test-nonexistent.toml")).unwrap();
+        assert_eq!(config.storage.backend, "secret-service");
+    }
+
+    #[test]
+    fn load_valid_config() {
+        let dir = tempfile::tempdir().unwrap();
+        let path = dir.path().join("config.toml");
+        let mut f = std::fs::File::create(&path).unwrap();
+        writeln!(
+            f,
+            r#"
+[storage]
+backend = "file"
+
+[jurisdictions]
+extra_paths = ["/tmp/extra.toml"]
+"#
+        )
+        .unwrap();
+
+        let config = Config::load(&path).unwrap();
+        assert_eq!(config.storage.backend, "file");
+        assert_eq!(
+            config.jurisdictions.extra_paths,
+            vec![PathBuf::from("/tmp/extra.toml")]
+        );
+    }
+
+    #[test]
+    fn load_partial_config_uses_defaults() {
+        let dir = tempfile::tempdir().unwrap();
+        let path = dir.path().join("config.toml");
+        std::fs::write(&path, "[storage]\n").unwrap();
+
+        let config = Config::load(&path).unwrap();
+        assert_eq!(config.storage.backend, "secret-service");
+        assert!(config.jurisdictions.extra_paths.is_empty());
+    }
+
+    #[test]
+    fn load_empty_config_uses_defaults() {
+        let dir = tempfile::tempdir().unwrap();
+        let path = dir.path().join("config.toml");
+        std::fs::write(&path, "").unwrap();
+
+        let config = Config::load(&path).unwrap();
+        assert_eq!(config.storage.backend, "secret-service");
+    }
+
+    #[test]
+    fn load_invalid_toml_returns_error() {
+        let dir = tempfile::tempdir().unwrap();
+        let path = dir.path().join("config.toml");
+        std::fs::write(&path, "not valid {{{{ toml").unwrap();
+
+        assert!(Config::load(&path).is_err());
+    }
+}

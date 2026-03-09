@@ -222,6 +222,58 @@ async fn run_cli(command: Command) -> anyhow::Result<()> {
     Ok(())
 }
 
+#[cfg(test)]
+mod tests {
+    use super::*;
+    use std::path::PathBuf;
+
+    #[test]
+    fn config_path_returns_config_toml() {
+        let path = config_path();
+        assert!(path.ends_with("config.toml"));
+        // Should be under an "aged" directory
+        let parent = path.parent().unwrap();
+        assert_eq!(parent.file_name().unwrap(), "aged");
+    }
+
+    #[test]
+    fn load_jurisdictions_default_config() {
+        let config = Config::default();
+        let registry = load_jurisdictions(&config);
+        let names = registry.list_names();
+        assert!(names.contains(&"US/California".to_string()));
+        assert!(names.contains(&"US/Colorado".to_string()));
+    }
+
+    #[test]
+    fn load_jurisdictions_with_extra_path() {
+        let config = Config {
+            jurisdictions: config::JurisdictionsConfig {
+                extra_paths: vec![PathBuf::from("tests/data/no_catchall.toml")],
+            },
+            ..Config::default()
+        };
+        let registry = load_jurisdictions(&config);
+        let names = registry.list_names();
+        // Should have builtins plus the extra
+        assert!(names.contains(&"US/California".to_string()));
+        assert!(names.contains(&"Test/NoCatchAll".to_string()));
+    }
+
+    #[test]
+    fn load_jurisdictions_bad_extra_path_is_ignored() {
+        let config = Config {
+            jurisdictions: config::JurisdictionsConfig {
+                extra_paths: vec![PathBuf::from("/nonexistent/path.toml")],
+            },
+            ..Config::default()
+        };
+        // Should not panic, just log a warning and continue with builtins
+        let registry = load_jurisdictions(&config);
+        assert!(registry.list_names().contains(&"US/California".to_string()));
+    }
+}
+
 #[tokio::main]
 async fn main() -> anyhow::Result<()> {
     tracing_subscriber::fmt()

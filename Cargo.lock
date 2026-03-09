@@ -25,6 +25,7 @@ dependencies = [
  "sd-notify",
  "secret-service",
  "serde",
+ "tempfile",
  "thiserror",
  "tokio",
  "toml",

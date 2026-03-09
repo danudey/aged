@@ -56,4 +56,45 @@ mod tests {
         let on = NaiveDate::from_ymd_opt(2025, 6, 1).unwrap();
         assert_eq!(calculate_age_on(birth, on), 0);
     }
+
+    #[test]
+    fn calculate_age_returns_non_negative() {
+        // A birthdate far in the past should produce a reasonable age
+        let birth = NaiveDate::from_ymd_opt(1900, 1, 1).unwrap();
+        let age = calculate_age(birth);
+        assert!(age >= 125);
+    }
+
+    #[test]
+    fn calculate_age_recent_birth() {
+        // A very recent birthdate should be 0 or 1
+        let birth = Utc::now().date_naive();
+        let age = calculate_age(birth);
+        assert_eq!(age, 0);
+    }
+
+    #[test]
+    fn age_same_month_earlier_day() {
+        let birth = NaiveDate::from_ymd_opt(2000, 6, 20).unwrap();
+        let on = NaiveDate::from_ymd_opt(2025, 6, 10).unwrap();
+        assert_eq!(calculate_age_on(birth, on), 24);
+    }
+
+    #[test]
+    fn age_same_month_later_day() {
+        let birth = NaiveDate::from_ymd_opt(2000, 6, 10).unwrap();
+        let on = NaiveDate::from_ymd_opt(2025, 6, 20).unwrap();
+        assert_eq!(calculate_age_on(birth, on), 25);
+    }
+
+    #[test]
+    fn age_leap_day_birthday() {
+        let birth = NaiveDate::from_ymd_opt(2000, 2, 29).unwrap();
+        // On March 1 of a non-leap year
+        let on = NaiveDate::from_ymd_opt(2025, 3, 1).unwrap();
+        assert_eq!(calculate_age_on(birth, on), 25);
+        // On Feb 28 of a non-leap year (hasn't reached birthday yet)
+        let on = NaiveDate::from_ymd_opt(2025, 2, 28).unwrap();
+        assert_eq!(calculate_age_on(birth, on), 24);
+    }
 }

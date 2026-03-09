@@ -41,3 +41,54 @@ impl From<Error> for zbus::fdo::Error {
         zbus::fdo::Error::Failed(e.to_string())
     }
 }
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+
+    #[test]
+    fn error_display_messages() {
+        assert_eq!(Error::NoBirthdate.to_string(), "no birthdate stored");
+        assert_eq!(
+            Error::InvalidDate("bad".into()).to_string(),
+            "invalid date format: bad"
+        );
+        assert_eq!(
+            Error::UnknownJurisdiction("US/TX".into()).to_string(),
+            "unknown jurisdiction: US/TX"
+        );
+        assert_eq!(
+            Error::NoDefaultJurisdiction.to_string(),
+            "no default jurisdiction set"
+        );
+        assert_eq!(
+            Error::NoBrackets("X".into()).to_string(),
+            "no brackets configured for jurisdiction: X"
+        );
+        assert_eq!(
+            Error::Storage("oops".into()).to_string(),
+            "storage error: oops"
+        );
+        assert_eq!(Error::Config("bad".into()).to_string(), "config error: bad");
+        assert_eq!(
+            Error::GeoClue("fail".into()).to_string(),
+            "geoclue error: fail"
+        );
+    }
+
+    #[test]
+    fn error_to_zbus_fdo() {
+        let err: zbus::fdo::Error = Error::NoBirthdate.into();
+        match err {
+            zbus::fdo::Error::Failed(msg) => assert_eq!(msg, "no birthdate stored"),
+            other => panic!("expected Failed, got {other:?}"),
+        }
+    }
+
+    #[test]
+    fn io_error_converts() {
+        let io_err = std::io::Error::new(std::io::ErrorKind::NotFound, "gone");
+        let err: Error = io_err.into();
+        assert!(err.to_string().contains("gone"));
+    }
+}
